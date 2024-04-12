@@ -30,12 +30,12 @@ def validate_api_key(api_key: str) -> None:
         raise ValueError("API Key is required for Upstage Document Loader")
 
 
-def validate_file_path(file_path: str) -> None:
+def validate_file_path(file_path: Union[str, Path]) -> None:
     """
     Validates if a file exists at the given file path.
 
     Args:
-        file_path (str): The path to the file.
+        file_path (Union[str, Path]): The path to the file.
 
     Raises:
         FileNotFoundError: If the file does not exist at the given file path.
@@ -71,7 +71,7 @@ class LayoutAnalysis:
         file_path: Union[str, Path],
         output_type: OutputType = "text",
         split: SplitType = "none",
-        api_key: str = None,
+        api_key: Optional[str] = None,
     ):
         """
         Initializes an instance of the Upstage document loader.

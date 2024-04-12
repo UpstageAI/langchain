@@ -1,4 +1,5 @@
 """Test ChatUpstage chat model."""
+
 from langchain_upstage.chat_models import ChatUpstage
 
 

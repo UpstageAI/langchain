@@ -5,6 +5,7 @@ from typing import Dict, Iterator, List, Literal, Optional
 
 import fitz
 import requests
+from fitz import Document as fitzDocument
 from langchain_community.document_loaders.base import BaseBlobParser
 from langchain_community.document_loaders.blob_loaders import Blob
 from langchain_core.documents import Document
@@ -94,7 +95,7 @@ def get_from_param_or_env(
 class LayoutAnalysisParser(BaseBlobParser):
     def __init__(
         self,
-        api_key: str = None,
+        api_key: Optional[str] = None,
         output_type: OutputType = "text",
         split: SplitType = "none",
     ):
@@ -120,7 +121,7 @@ class LayoutAnalysisParser(BaseBlobParser):
 
         validate_api_key(self.api_key)
 
-    def _get_response(self, files) -> Dict:
+    def _get_response(self, files: Dict) -> Dict:
         """
         Sends a POST request to the API endpoint with the provided files and
         returns the response.
@@ -153,7 +154,10 @@ class LayoutAnalysisParser(BaseBlobParser):
         return result
 
     def _split_and_request(
-        self, full_docs, start_page: int, split_pages: int = LIMIT_OF_PAGE_REQUEST
+        self,
+        full_docs: fitzDocument,
+        start_page: int,
+        split_pages: int = LIMIT_OF_PAGE_REQUEST,
     ) -> Dict:
         """
         Splits the full pdf document into partial pages and sends a request to the
@@ -181,7 +185,7 @@ class LayoutAnalysisParser(BaseBlobParser):
 
         return response
 
-    def _element_document(self, elements) -> List[Document]:
+    def _element_document(self, elements: Dict) -> Document:
         """
         Converts an elements into a Document object.
 
@@ -202,7 +206,7 @@ class LayoutAnalysisParser(BaseBlobParser):
             },
         )
 
-    def _page_document(self, elements) -> List[Document]:
+    def _page_document(self, elements: Dict) -> List[Document]:
         """
         Combines elements with the same page number into a single Document object.
 

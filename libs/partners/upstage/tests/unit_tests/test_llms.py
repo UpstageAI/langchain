@@ -1,4 +1,5 @@
 """Test Upstage Chat API wrapper."""
+
 from langchain_upstage import UpstageLLM
 
 

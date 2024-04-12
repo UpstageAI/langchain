@@ -1,6 +1,5 @@
 """Test embedding model integration."""
 
-
 from langchain_upstage.embeddings import UpstageEmbeddings
 
 

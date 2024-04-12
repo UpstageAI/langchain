@@ -13,8 +13,12 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = ">=3.8.1,<4.0"
 openai = "^1.10.0"
-langchain-core = ">=0.0.12"
+langchain-core = "^0.1.37"
 langchain-openai = ">=0.1.0"
+pymupdf = ">=1.24.1"
+requests = ">=2.31.0"
+types-requests = ">=2.31.0"
+langchain_community = ">=0.0.31"
 
 [tool.poetry.group.test]
 optional = true

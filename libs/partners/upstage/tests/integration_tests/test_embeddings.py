@@ -1,5 +1,6 @@
 """Test Upstage embeddings."""
-from langchain_upstage import UpstageEmbeddings
+
+from langchain_upstage.embeddings import UpstageEmbeddings
 
 
 def test_langchain_upstage_embed_documents() -> None:

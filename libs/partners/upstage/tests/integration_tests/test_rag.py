@@ -7,9 +7,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.runnables.base import RunnableSerializable
 
-from langchain_upstage import ChatUpstage
-from langchain_upstage.embeddings import UpstageEmbeddings
-from langchain_upstage.tools.groundedness_check import GroundednessCheck
+from langchain_upstage import ChatUpstage, UpstageEmbeddings
 
 
 def test_upstage_rag() -> None:

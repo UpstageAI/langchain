@@ -6,7 +6,6 @@ from langchain_upstage.layout_analysis_parsers import LayoutAnalysisParser
 __all__ = [
     "ChatUpstage",
     "UpstageEmbeddings",
-
     "LayoutAnalysis",
     "LayoutAnalysisParser",
 ]

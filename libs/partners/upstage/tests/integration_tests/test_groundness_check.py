@@ -1,4 +1,4 @@
-from langchain_upstage.tools.groundedness_check import GroundednessCheck
+from langchain_upstage import GroundednessCheck
 
 
 def test_langchain_upstage_groundness_check() -> None:

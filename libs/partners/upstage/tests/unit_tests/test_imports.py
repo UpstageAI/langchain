@@ -5,6 +5,7 @@ EXPECTED_ALL = [
     "UpstageEmbeddings",
     "LayoutAnalysis",
     "LayoutAnalysisParser",
+    "GroundednessCheck",
 ]
 
 

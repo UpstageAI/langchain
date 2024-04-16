@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import List
 
 from langchain_community.vectorstores import DocArrayInMemorySearch
@@ -7,9 +8,11 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.runnables.base import RunnableSerializable
 
-from langchain_upstage import ChatUpstage
+from langchain_upstage import ChatUpstage, LayoutAnalysis
 from langchain_upstage.embeddings import UpstageEmbeddings
 from langchain_upstage.tools.groundedness_check import GroundednessCheck
+
+EXAMPLE_PDF_PATH = Path(__file__).parent.parent / "examples/solar.pdf"
 
 
 def test_upstage_rag() -> None:
@@ -17,12 +20,11 @@ def test_upstage_rag() -> None:
 
     model = ChatUpstage()
 
-    # TODO: Do Layout Analysis
+    loader = LayoutAnalysis(file_path=EXAMPLE_PDF_PATH, split="element")
+    docs = loader.load()
 
-    # TODO: Embed each html tag.
-    vectorstore = DocArrayInMemorySearch.from_texts(
-        ["harrison worked at kensho", "bears like to eat honey"],
-        embedding=UpstageEmbeddings(),
+    vectorstore = DocArrayInMemorySearch.from_documents(
+        docs, embedding=UpstageEmbeddings()
     )
     retriever = vectorstore.as_retriever()
 
@@ -34,7 +36,9 @@ def test_upstage_rag() -> None:
     prompt = ChatPromptTemplate.from_template(template)
     output_parser = StrOutputParser()
 
-    retrieved_docs = retriever.get_relevant_documents("What did Harrison do?")
+    retrieved_docs = retriever.get_relevant_documents(
+        "How many parameters in SOLAR model?"
+    )
 
     groundedness_check = GroundednessCheck()
     groundedness = ""
@@ -44,7 +48,10 @@ def test_upstage_rag() -> None:
         )
 
         result = chain.invoke(
-            {"context": retrieved_docs, "question": "What did Harrison do?"}
+            {
+                "context": retrieved_docs,
+                "question": "How many parameters in SOLAR model?",
+            }
         )
 
         # convert all Documents to string

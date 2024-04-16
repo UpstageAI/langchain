@@ -18,6 +18,7 @@ langchain-openai = ">=0.1.0"
 pymupdf = ">=1.24.1"
 requests = ">=2.31.0"
 types-requests = ">=2.31.0"
+langchain_community = ">=0.0.31"
 
 [tool.poetry.group.test]
 optional = true
@@ -33,6 +34,7 @@ langchain-openai = {path = "../openai", develop = true}
 langchain-core = {path = "../../core", develop = true}
 docarray = "^0.32.1"
 pydantic = "^1.10.9"
+langchain_community = {path = "../../community", develop = true}
 langchain-standard-tests = {path = "../../standard-tests", develop = true}
 
 [tool.poetry.group.codespell]

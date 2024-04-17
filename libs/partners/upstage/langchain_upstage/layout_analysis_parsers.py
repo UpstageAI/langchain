@@ -170,10 +170,6 @@ class LayoutAnalysisParser(BaseBlobParser):
             print(f"JSON Decode Error: {json_err}")
             raise ValueError(f"Failed to decode JSON response: {json_err}")
 
-        finally:
-            if "document" in files and not files["document"].closed:
-                files["document"].close()
-
         return result
 
     def _split_and_request(
@@ -204,8 +200,8 @@ class LayoutAnalysisParser(BaseBlobParser):
             )
             pdf_bytes = chunk_pdf.write()
 
-        files = {"document": io.BytesIO(pdf_bytes)}
-        response = self._get_response(files)
+        with io.BytesIO(pdf_bytes) as f:
+            response = self._get_response({"document": f})
 
         return response
 
@@ -307,9 +303,9 @@ class LayoutAnalysisParser(BaseBlobParser):
                     start_page += num_pages
 
             else:
-                files = {"document": open(blob.path, "rb")}
-                response = self._get_response(files)
-                result = parse_output(response, self.output_type)
+                with open(blob.path, "rb") as f:
+                    response = self._get_response({"document": f})
+                    result = parse_output(response, self.output_type)
 
             yield Document(
                 page_content=result,
@@ -334,8 +330,8 @@ class LayoutAnalysisParser(BaseBlobParser):
                     start_page += num_pages
 
             else:
-                files = {"document": open(blob.path, "rb")}
-                response = self._get_response(files)
+                with open(blob.path, "rb") as f:
+                    response = self._get_response({"document": f})
 
                 for element in response["elements"]:
                     yield self._element_document(element)
@@ -353,8 +349,9 @@ class LayoutAnalysisParser(BaseBlobParser):
 
                     start_page += num_pages
             else:
-                files = {"document": open(blob.path, "rb")}
-                response = self._get_response(files)
+                with open(blob.path, "rb") as f:
+                    response = self._get_response({"document": f})
+
                 elements = response["elements"]
 
                 yield from self._page_document(elements)

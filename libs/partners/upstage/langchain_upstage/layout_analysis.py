@@ -131,7 +131,7 @@ class LayoutAnalysis:
             output_type=self.output_type,
             use_ocr=self.use_ocr,
         )
-        return list(parser.lazy_parse(blob, page_batch_size=DEFAULT_PAGE_BATCH_SIZE))
+        return list(parser.lazy_parse(blob, is_batch=True))
 
     def lazy_load(self) -> Iterator[Document]:
         """

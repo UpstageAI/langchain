@@ -12,7 +12,7 @@ from langchain_core.documents import Document
 
 LAYOUT_ANALYSIS_URL = "https://api.upstage.ai/v1/document-ai/layout-analyzer"
 
-DEFAULT_PAGE_BATCH_SIZE = 10
+DEFAULT_NUMBER_OF_PAGE = 10
 
 OutputType = Literal["text", "html"]
 SplitType = Literal["none", "element", "page"]
@@ -180,7 +180,7 @@ class LayoutAnalysisParser(BaseBlobParser):
         self,
         full_docs: fitzDocument,
         start_page: int,
-        page_batch_size: int = DEFAULT_PAGE_BATCH_SIZE,
+        num_pages: int = DEFAULT_NUMBER_OF_PAGE,
     ) -> Dict:
         """
         Splits the full pdf document into partial pages and sends a request to the
@@ -189,9 +189,9 @@ class LayoutAnalysisParser(BaseBlobParser):
         Args:
             full_docs (str): The full document to be split and requested.
             start_page (int): The starting page number for splitting the document.
-            page_batch_size (int, optional): The number of pages to split the document
+            num_pages (int, optional): The number of pages to split the document
                                              into.
-                                             Defaults to DEFAULT_PAGE_BATCH_SIZE.
+                                             Defaults to DEFAULT_NUMBER_OF_PAGE.
 
         Returns:
             response: The response from the server.
@@ -200,7 +200,7 @@ class LayoutAnalysisParser(BaseBlobParser):
             chunk_pdf.insert_pdf(
                 full_docs,
                 from_page=start_page,
-                to_page=start_page + page_batch_size - 1,
+                to_page=start_page + num_pages - 1,
             )
             pdf_bytes = chunk_pdf.write()
 
@@ -266,16 +266,15 @@ class LayoutAnalysisParser(BaseBlobParser):
 
         return _docs
 
-    def lazy_parse(self, blob: Blob, page_batch_size: int = 1) -> Iterator[Document]:
+    def lazy_parse(self, blob: Blob, is_batch: bool = False) -> Iterator[Document]:
         """
         Lazily parses a document and yields Document objects based on the specified
         split type.
 
         Args:
             blob (Blob): The input document blob to parse.
-            page_batch_size (int, optional): The number of pages to split the document.
-                                         Defaults to 1, which means requesting one
-                                         page at a time.
+            is_batch (bool, optional): Whether to parse the document in batches.
+                                       Defaults to False (single page parsing)
 
         Yields:
             Document: The parsed document object.
@@ -284,6 +283,12 @@ class LayoutAnalysisParser(BaseBlobParser):
             ValueError: If an invalid split type is provided.
 
         """
+
+        if is_batch:
+            num_pages: int = DEFAULT_NUMBER_OF_PAGE
+        else:
+            num_pages: int = 1
+
         full_docs = fitz.open(blob.path)
         number_of_pages = full_docs.page_count
 
@@ -291,17 +296,15 @@ class LayoutAnalysisParser(BaseBlobParser):
             if full_docs.is_pdf:
                 result = ""
                 start_page = 0
-                page_batch_size = DEFAULT_PAGE_BATCH_SIZE
+                num_pages = DEFAULT_NUMBER_OF_PAGE
                 for _ in range(number_of_pages):
                     if start_page >= number_of_pages:
                         break
 
-                    response = self._split_and_request(
-                        full_docs, start_page, page_batch_size
-                    )
+                    response = self._split_and_request(full_docs, start_page, num_pages)
                     result += parse_output(response, self.output_type)
 
-                    start_page += page_batch_size
+                    start_page += num_pages
 
             else:
                 files = {"document": open(blob.path, "rb")}
@@ -324,13 +327,11 @@ class LayoutAnalysisParser(BaseBlobParser):
                     if start_page >= number_of_pages:
                         break
 
-                    response = self._split_and_request(
-                        full_docs, start_page, page_batch_size
-                    )
+                    response = self._split_and_request(full_docs, start_page, num_pages)
                     for element in response["elements"]:
                         yield self._element_document(element)
 
-                    start_page += page_batch_size
+                    start_page += num_pages
 
             else:
                 files = {"document": open(blob.path, "rb")}
@@ -346,13 +347,11 @@ class LayoutAnalysisParser(BaseBlobParser):
                     if start_page >= number_of_pages:
                         break
 
-                    response = self._split_and_request(
-                        full_docs, start_page, page_batch_size
-                    )
+                    response = self._split_and_request(full_docs, start_page, num_pages)
                     elements = response["elements"]
                     yield from self._page_document(elements)
 
-                    start_page += page_batch_size
+                    start_page += num_pages
             else:
                 files = {"document": open(blob.path, "rb")}
                 response = self._get_response(files)

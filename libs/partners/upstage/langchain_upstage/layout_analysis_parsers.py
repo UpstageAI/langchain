@@ -281,9 +281,9 @@ class LayoutAnalysisParser(BaseBlobParser):
         """
 
         if is_batch:
-            num_pages: int = DEFAULT_NUMBER_OF_PAGE
+            num_pages = DEFAULT_NUMBER_OF_PAGE
         else:
-            num_pages: int = 1
+            num_pages = 1
 
         full_docs = fitz.open(blob.path)
         number_of_pages = full_docs.page_count

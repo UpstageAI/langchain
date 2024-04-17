@@ -10,7 +10,7 @@ from langchain_community.document_loaders.base import BaseBlobParser
 from langchain_community.document_loaders.blob_loaders import Blob
 from langchain_core.documents import Document
 
-LAYOUT_ANALYSIS_URL = "https://api.upstage.ai/v1/document-ai/layout-analyzer"
+LAYOUT_ANALYSIS_URL = "https://api.upstage.ai/v1/document-ai/layout-analysis"
 
 DEFAULT_NUMBER_OF_PAGE = 10
 

@@ -158,12 +158,18 @@ class LayoutAnalysisParser(BaseBlobParser):
             response = requests.post(
                 LAYOUT_ANALYSIS_URL, headers=headers, files=files, json=options
             )
-            response.raise_for_status()  # HTTP 요청이 성공적으로 완료되었는지 확인
+            response.raise_for_status()
 
-            try:
-                result = response.json()  # JSON 디코딩
-            except json.JSONDecodeError as e:
-                raise ValueError(f"Failed to decode JSON response: {e}")
+            result = response.json()
+
+        except requests.RequestException as req_err:
+            # Handle any request-related exceptions
+            print(f"Request Exception: {req_err}")
+        except json.JSONDecodeError as json_err:
+            # Handle JSON decode errors
+            print(f"JSON Decode Error: {json_err}")
+            raise ValueError(f"Failed to decode JSON response: {json_err}")
+
         finally:
             if "document" in files and not files["document"].closed:
                 files["document"].close()

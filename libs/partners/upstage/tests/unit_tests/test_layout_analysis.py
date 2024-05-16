@@ -153,7 +153,9 @@ def test_none_split_html_output(mock_post: Mock) -> None:
     documents = loader.load()
 
     assert len(documents) == 1
-    assert documents[0].page_content == MOCK_RESPONSE_JSON["html"]
+    assert documents[0].page_content == "\n".join(
+        [element["html"] for element in MOCK_RESPONSE_JSON["elements"]]
+    )
     assert documents[0].metadata["total_pages"] == 1
     assert documents[0].metadata["type"] == "html"
     assert documents[0].metadata["split"] == "none"
@@ -201,7 +203,9 @@ def test_page_split_html_output(mock_post: Mock) -> None:
 
     assert len(documents) == 1
 
-    for i, document in enumerate(documents):
-        assert document.metadata["page"] == MOCK_RESPONSE_JSON["elements"][i]["page"]
-        assert document.metadata["type"] == "html"
-        assert document.metadata["split"] == "page"
+    assert documents[0].page_content == "\n ".join(
+        [element["html"] for element in MOCK_RESPONSE_JSON["elements"]]
+    )
+    assert documents[0].metadata["page"] == MOCK_RESPONSE_JSON["elements"][0]["page"]
+    assert documents[0].metadata["type"] == "html"
+    assert documents[0].metadata["split"] == "page"

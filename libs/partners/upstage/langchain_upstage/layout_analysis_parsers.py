@@ -49,7 +49,9 @@ def validate_file_path(file_path: str) -> None:
         raise FileNotFoundError(f"File not found: {file_path}")
 
 
-def parse_output(data: dict, output_type: Union[OutputType, dict]) -> str:
+def parse_output(
+    data: dict, output_type: Union[OutputType, dict], add_newline: bool = True
+) -> str:
     """
     Parse the output data based on the specified output type.
 
@@ -65,15 +67,16 @@ def parse_output(data: dict, output_type: Union[OutputType, dict]) -> str:
         ValueError: If the output type is invalid.
     """
     if isinstance(output_type, dict):
-        if data["category"] in output_type:
-            return data[output_type[data["category"]]]
+        category = data["category"]
+        if category in output_type:
+            return parse_output(data, output_type[category], add_newline)
         else:
             return data["text"]
     elif isinstance(output_type, str):
         if output_type == "text":
             return data["text"]
         elif output_type == "html":
-            return data["html"]
+            return data["html"] + "\n" if add_newline else data["html"]
         else:
             raise ValueError(f"Invalid output type: {output_type}")
     else:
@@ -240,7 +243,7 @@ class UpstageLayoutAnalysisParser(BaseBlobParser):
 
         """
         return Document(
-            page_content=(parse_output(elements, self.output_type)),
+            page_content=(parse_output(elements, self.output_type).strip()),
             metadata={
                 "page": elements["page"],
                 "id": elements["id"],
@@ -276,7 +279,7 @@ class UpstageLayoutAnalysisParser(BaseBlobParser):
 
             _docs.append(
                 Document(
-                    page_content=page_content,
+                    page_content=page_content.strip(),
                     metadata={
                         "page": group[0]["page"],
                         "type": self.output_type,
@@ -340,7 +343,7 @@ class UpstageLayoutAnalysisParser(BaseBlobParser):
                     result += parse_output(element, self.output_type)
 
             yield Document(
-                page_content=result,
+                page_content=result.strip(),
                 metadata={
                     "total_pages": number_of_pages,
                     "type": self.output_type,
